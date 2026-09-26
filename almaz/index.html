@@ -1,1 +1,216 @@
-a
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Avanço de obra · Almaz</title>
+<style>
+:root{
+  --tinta:#22303c; --tinta2:#5b6975; --linha:#dde2e6; --fundo:#eef1f3; --papel:#fff;
+  --amarelo:#fff2a8; --amarelo-borda:#d8bd3c;
+  --atr-bg:#f8d7da; --atr:#a1242f; --and-bg:#d6e6f9; --and:#1f4e8c;
+  --ini-bg:#eceef0; --ini:#4a545e; --con-bg:#d4edda; --con:#1e6b34;
+  --zap:#1daa61;
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px);
+}
+*,*::before,*::after{box-sizing:inherit}
+html,body{margin:0}
+body{font:14px/1.3 -apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;color:var(--tinta);background:var(--fundo);-webkit-text-size-adjust:100%}
+header{background:var(--tinta);color:#fff;padding:12px 12px 10px}
+header h1{font-size:16px;margin:0;font-weight:700}
+header p{margin:2px 0 0;font-size:12px;color:#c3ccd4}
+.avobra{display:flex;align-items:baseline;justify-content:space-between;gap:8px;margin-top:8px;padding-top:8px;border-top:1px solid rgba(255,255,255,.18)}
+.avobra span{font-size:13px;color:#c3ccd4}
+.avobra b{font-size:24px;font-weight:700;color:#fff;font-variant-numeric:tabular-nums}
+.campos{display:grid;grid-template-columns:minmax(0,190px);gap:8px;padding:10px 12px;background:var(--papel);border-bottom:1px solid var(--linha)}
+.campos label{display:block;font-size:11px;color:var(--tinta2);margin-bottom:3px}
+.campos input{width:100%;font:inherit;font-size:15px;padding:7px 8px;border:1px solid var(--amarelo-borda);background:var(--amarelo);border-radius:6px;color:var(--tinta);min-width:0}
+.aviso{margin:0;padding:8px 12px;font-size:13px;background:#e3f0e7;color:#1e5a33;border-bottom:1px solid #c4dfcc}
+.aviso[hidden]{display:none}
+.semjs{margin:10px 12px;padding:12px;font-size:14px;line-height:1.4;background:#fdecc8;border:1px solid #e0b45a;border-radius:8px;color:#5a3d00}
+.abas{display:flex;background:var(--papel);border-bottom:1px solid var(--linha);position:sticky;top:0;z-index:5}
+.abas button{flex:1;font:inherit;font-weight:600;padding:10px 0;border:0;background:none;color:var(--tinta2);border-bottom:3px solid transparent}
+.abas button[aria-selected="true"]{color:var(--tinta);border-bottom-color:var(--tinta)}
+main{padding:0 0 84px}
+table{width:100%;border-collapse:collapse;table-layout:fixed;background:var(--papel)}
+#lista th{position:sticky;top:42px;z-index:4;background:#f6f7f8;font-size:11px;font-weight:600;color:var(--tinta2);text-align:left;padding:6px 4px;border-bottom:1px solid var(--linha)}
+#lista td{padding:4px 4px;border-bottom:1px solid var(--linha);vertical-align:middle;font-size:13px}
+#lista .c-dt{width:40px;text-align:center;font-size:12px;color:var(--tinta2);font-variant-numeric:tabular-nums}
+#lista .c-pc{width:50px;text-align:center}
+#lista .c-si{width:72px;text-align:center}
+#lista td:first-child,#lista th:first-child{padding-left:10px}
+#lista td:last-child,#lista th:last-child{padding-right:8px}
+.nm{overflow-wrap:anywhere}
+.nm small{color:var(--tinta2);font-size:11px}
+tr.etapa td{background:var(--tinta);color:#fff;font-weight:700;font-size:12px;padding:5px 10px}
+tr.grupo td{background:#e7ebee;color:var(--tinta);font-size:11.5px;padding:3px 10px;line-height:1.25}
+tr.grupo span{color:var(--tinta2)}
+.pc{width:44px;font:inherit;font-size:15px;text-align:center;padding:4px 2px;border:1px solid var(--amarelo-borda);background:var(--amarelo);border-radius:5px;color:var(--tinta)}
+.pc.lancado{font-weight:700;border-color:var(--tinta)}
+.pc:focus{outline:2px solid var(--tinta);outline-offset:1px}
+.si{display:inline-block;font-size:10px;font-weight:700;line-height:1.15;padding:3px 4px;border-radius:4px;width:100%}
+.s-Atrasada{background:var(--atr-bg);color:var(--atr)}
+.s-andamento{background:var(--and-bg);color:var(--and)}
+.s-iniciar{background:var(--ini-bg);color:var(--ini)}
+.s-Concluida{background:var(--con-bg);color:var(--con)}
+.assina{background:var(--papel);padding:14px 12px 16px;border-top:2px solid var(--tinta)}
+.assina label{display:block;font-size:12px;font-weight:600;margin-bottom:4px}
+.assina input{width:100%;font:inherit;font-size:16px;padding:9px 10px;border:1px solid var(--amarelo-borda);background:var(--amarelo);border-radius:6px;color:var(--tinta)}
+#resumo{display:none;padding:12px 8px}
+#resumo table{border:1px solid var(--linha)}
+#resumo th,#resumo td{padding:7px 3px;border-bottom:1px solid var(--linha);text-align:center;font-size:12.5px;font-variant-numeric:tabular-nums}
+#resumo th{font-size:10.5px;color:var(--tinta2);font-weight:600;background:#f6f7f8;line-height:1.15}
+#resumo td:first-child,#resumo th:first-child{text-align:left;padding-left:8px;width:29%}
+#resumo th:last-child,#resumo td:last-child{width:15%;padding-right:6px}
+#resumo tr.total td{font-weight:700;background:#e7ebee}
+#resumo .atr{color:var(--atr);font-weight:700}
+#resumo p{font-size:12px;color:var(--tinta2);margin:10px 4px 0}
+.acoes{position:fixed;left:0;right:0;bottom:0;z-index:6;background:var(--papel);border-top:1px solid var(--linha);padding:8px 12px calc(8px + env(safe-area-inset-bottom,0px));display:grid;gap:6px}
+.acoes button{font:inherit;font-weight:700;font-size:14px;padding:12px 8px;line-height:1.2;border-radius:8px;border:0}
+#enviar{background:var(--zap);color:#fff}
+.msg{font-size:12px;color:var(--atr);text-align:center;min-height:0}
+.msg:empty{display:none}
+.msg.ok{color:var(--con)}
+</style>
+</head>
+<body>
+<header>
+  <h1>Avanço de obra · Almaz</h1>
+  <p>Serviços com atividade de outubro a dezembro/2026 · <span id="qtd"></span></p>
+  <div class="avobra"><span>Executado da obra</span><b id="avobra">0,00%</b></div>
+</header>
+<div class="semjs" id="semjs"><b>A lista não carregou?</b> O arquivo abriu numa pré-visualização, que não funciona. <b>No iPhone:</b> toque em Compartilhar e escolha <b>Chrome</b>. <b>No Android:</b> escolha abrir com o <b>Chrome</b>.</div>
+<p class="aviso" id="faixa" hidden></p>
+<div class="campos">
+  <div><label for="status">Data do preenchimento</label><input type="date" id="status"></div>
+</div>
+<nav class="abas" role="tablist">
+  <button role="tab" aria-selected="true" data-aba="lista">Atividades</button>
+  <button role="tab" aria-selected="false" data-aba="resumo">Resumo</button>
+</nav>
+<main>
+  <table id="lista">
+    <thead><tr><th>Atividade</th><th class="c-dt">Início</th><th class="c-dt">Térm.</th><th class="c-pc">%</th><th class="c-si">Situação</th></tr></thead>
+    <tbody></tbody>
+  </table>
+  <div class="assina" id="assina"><label for="nome">Seu nome</label><input type="text" id="nome" autocomplete="name" enterkeyhint="done" placeholder="Digite seu nome"></div>
+  <section id="resumo">
+    <table>
+      <thead><tr><th>Etapa</th><th>Total</th><th>Atras.</th><th>Em andam.</th><th>A iniciar</th><th>Concl.</th><th>Avanço médio</th></tr></thead>
+      <tbody></tbody>
+    </table>
+    <p>Situação recalculada pela data de status. Avanço médio é a média simples do % das atividades.</p>
+  </section>
+</main>
+<div class="acoes">
+  <div class="msg" id="msg"></div>
+  <button id="enviar" type="button">Enviar arquivo preenchido para o engenheiro</button>
+</div>
+
+<script id="dados" type="application/json">{"status": "2026-09-26", "base": 0.0002978565616651, "ativ": [{"i": 5, "e": "Contenção e Fundação", "g": "", "n": "Mureta Guia", "s": "2026-08-10", "f": "2026-09-21", "r": "", "p": 0, "w": 0.0009473876688053}, {"i": 6, "e": "Contenção e Fundação", "g": "", "n": "Parede Diafragma - 56 lamelas", "s": "2026-08-17", "f": "2026-09-28", "r": "", "p": 0, "w": 0.0330355240718624}, {"i": 7, "e": "Contenção e Fundação", "g": "", "n": "Gabarito", "s": "2026-09-15", "f": "2026-09-28", "r": "", "p": 0, "w": 0.0}, {"i": 9, "e": "Contenção e Fundação", "g": "", "n": "Estaca Barrete - 28 unids", "s": "2026-09-22", "f": "2026-11-04", "r": "", "p": 0, "w": 0.0150866607520125}, {"i": 10, "e": "Contenção e Fundação", "g": "", "n": "Estaca Escavada - 51 estacas", "s": "2026-09-22", "f": "2026-11-04", "r": "", "p": 0, "w": 0.0153021633497985}, {"i": 11, "e": "Contenção e Fundação", "g": "", "n": "Escavação - 1º trecho", "s": "2026-11-05", "f": "2026-11-18", "r": "", "p": 0, "w": 0.0023777556743997}, {"i": 12, "e": "Contenção e Fundação", "g": "", "n": "Tirantes - 1ª Linha A - 64t", "s": "2026-11-05", "f": "2026-12-01", "r": "", "p": 0, "w": 0.0045170744176446}, {"i": 13, "e": "Contenção e Fundação", "g": "", "n": "Escavação - 2º trecho", "s": "2026-11-16", "f": "2026-12-07", "r": "", "p": 0, "w": 0.0023777556743997}, {"i": 14, "e": "Contenção e Fundação", "g": "", "n": "Tirantes - 2º Linha B - 64t", "s": "2026-12-02", "f": "2027-01-05", "r": "", "p": 0, "w": 0.0045170744176446}, {"i": 15, "e": "Contenção e Fundação", "g": "", "n": "Escavação - 3º trecho", "s": "2026-12-17", "f": "2027-01-15", "r": "", "p": 0, "w": 0.0023777556743997}, {"i": 4093, "e": "Concessionárias", "g": "ENEL - RESIDENCIAL ALTO - Câmara transformadora - Baixa Tensão > PROCESSO | CÂMARA TRANSFORMADORA", "n": "Aprovação de projetos", "s": "2026-12-01", "f": "2027-05-13", "r": "", "p": 0, "w": 0.0}]}</script>
+<script id="preenchido" type="application/json">null</script>
+<script>
+(function(){
+var ORIGINAL='<!DOCTYPE html>\n'+document.documentElement.outerHTML;
+var API='https://script.google.com/macros/s/AKfycbxdeKPxZLIQkVUYTSsi2sWOhoLN-kuUqslj6ObhWb8OKDGUdL6kNOLGqriopKNSQOAg/exec';
+var CFG=JSON.parse(document.getElementById('dados').textContent);
+var PRE=JSON.parse(document.getElementById('preenchido').textContent);
+var CHAVE='acomp-almaz-out-dez2026'+(PRE?':'+PRE.quando:'');
+var H=new Date(),HOJE=H.getFullYear()+'-'+('0'+(H.getMonth()+1)).slice(-2)+'-'+('0'+H.getDate()).slice(-2);
+var est={status:HOJE,dataEditada:false,nome:'',valores:{}};
+try{var g=localStorage.getItem(CHAVE);if(g)est=Object.assign(est,JSON.parse(g));else if(PRE){est.status=PRE.status;est.valores=PRE.valores||{};}}catch(e){if(PRE){est.status=PRE.status;est.valores=PRE.valores||{};}}
+if(!PRE&&!est.dataEditada)est.status=HOJE;
+function salvar(){try{localStorage.setItem(CHAVE,JSON.stringify(est))}catch(e){}}
+var $=function(id){return document.getElementById(id)};
+function dm(s){return s?s.slice(8,10)+'/'+s.slice(5,7):''}
+function dma(s){return s.slice(8,10)+'/'+s.slice(5,7)+'/'+s.slice(0,4)}
+function esc(t){return String(t).replace(/[&<>"]/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]})}
+function pct(a){var v=est.valores[a.i];return v===undefined?a.p:v}
+function situ(a){var p=pct(a),s=est.status;
+  if(p>=100)return'Concluída'; if(a.f<s)return'Atrasada';
+  if(p>0||a.r||a.s<=s)return'Em andamento'; return'A iniciar'}
+var CLS={'Concluída':'s-Concluida','Atrasada':'s-Atrasada','Em andamento':'s-andamento','A iniciar':'s-iniciar'};
+
+if(PRE){var q=new Date(PRE.quando);var f=$('faixa');f.hidden=false;
+  f.textContent='Preenchido por '+PRE.nome+' em '+dma(PRE.status)+' (enviado em '+q.toLocaleDateString('pt-BR')+' às '+q.toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'})+')';}
+$('status').value=est.status; $('nome').value=est.nome||'';
+$('qtd').textContent=CFG.ativ.length+' atividades';
+
+var tb=document.querySelector('#lista tbody'),h='',ue='',ug=null;
+CFG.ativ.forEach(function(a,k){
+  if(a.e!==ue){h+='<tr class="etapa"><td colspan="5">'+esc(a.e)+'</td></tr>';ue=a.e;ug=null}
+  if(a.g&&a.g!==ug){var pr=a.g.split(' > ');var ult=pr.pop();
+    h+='<tr class="grupo"><td colspan="5">'+(pr.length?'<span>'+esc(pr.join(' › '))+' › </span>':'')+'<b>'+esc(ult)+'</b></td></tr>';ug=a.g}
+  var v=est.valores[a.i];
+  h+='<tr><td class="nm">'+esc(a.n)+' <small>#'+a.i+'</small></td><td class="c-dt">'+dm(a.s)+'</td><td class="c-dt">'+dm(a.f)+'</td>'+
+     '<td class="c-pc"><input class="pc'+(v!==undefined?' lancado':'')+'" data-k="'+k+'" type="text" inputmode="decimal" enterkeyhint="next" autocomplete="off" aria-label="% executado de '+esc(a.n)+'" placeholder="'+a.p+'" value="'+(v!==undefined?String(v).replace('.',','):'')+'"></td>'+
+     '<td class="c-si"><span class="si" id="si'+k+'"></span></td></tr>';
+});
+tb.innerHTML=h;
+var inputs=[].slice.call(document.querySelectorAll('.pc'));
+
+function pintar(k){var a=CFG.ativ[k],s=situ(a),el=$('si'+k);el.textContent=s;el.className='si '+CLS[s]}
+function resumo(){var m={},ord=[];
+  CFG.ativ.forEach(function(a){if(!m[a.e]){m[a.e]={t:0,Atrasada:0,'Em andamento':0,'A iniciar':0,'Concluída':0,soma:0};ord.push(a.e)}
+    var r=m[a.e];r.t++;r[situ(a)]++;r.soma+=pct(a)});
+  var T={t:0,Atrasada:0,'Em andamento':0,'A iniciar':0,'Concluída':0,soma:0},h='';
+  function lin(n,r,c){return'<tr'+(c?' class="total"':'')+'><td>'+esc(n)+'</td><td>'+r.t+'</td><td class="'+(r.Atrasada?'atr':'')+'">'+r.Atrasada+'</td><td>'+r['Em andamento']+'</td><td>'+r['A iniciar']+'</td><td>'+r['Concluída']+'</td><td>'+(r.t?Math.round(r.soma/r.t):0)+'%</td></tr>'}
+  ord.forEach(function(e){var r=m[e];for(var x in T)T[x]+=r[x];h+=lin(e,r)});
+  h+=lin('Total',T,1);document.querySelector('#resumo tbody').innerHTML=h;avObra()}
+function avObra(){var v=CFG.base||0;CFG.ativ.forEach(function(a){v+=(a.w||0)*pct(a)/100});$('avobra').textContent=(v*100).toFixed(2).replace('.',',')+'%'}
+function tudo(){CFG.ativ.forEach(function(a,k){pintar(k)});resumo()}
+tudo();
+$('semjs').style.display='none';
+fetch(API).then(function(r){return r.json()}).then(function(d){
+  if(!d||!d.ok)return;
+  var mudou=false;
+  Object.keys(d.valores).forEach(function(id){
+    var r=d.valores[id];
+    if(r.p!==undefined&&r.p!==null&&r.p!==''){est.valores[id]=Number(r.p);mudou=true}
+  });
+  if(mudou){salvar();
+    inputs.forEach(function(inp){var a=CFG.ativ[+inp.dataset.k];var v=est.valores[a.i];
+      inp.value=v===undefined?'':String(v).replace('.',',');inp.classList.toggle('lancado',v!==undefined)});
+    tudo();
+  }
+}).catch(function(){});
+
+function ler(t){t=String(t).replace('%','').replace(',','.').trim();if(t==='')return undefined;var n=parseFloat(t);if(isNaN(n))return null;return Math.max(0,Math.min(100,Math.round(n*10)/10))}
+inputs.forEach(function(inp,idx){
+  inp.addEventListener('input',function(){var v=ler(inp.value);var a=CFG.ativ[+inp.dataset.k];
+    if(v===undefined)delete est.valores[a.i];else if(v!==null)est.valores[a.i]=v;
+    inp.classList.toggle('lancado',est.valores[a.i]!==undefined);pintar(+inp.dataset.k);resumo();salvar();
+    if(v!==null&&v!==undefined){
+      fetch(API,{method:'POST',body:JSON.stringify({i:a.i,p:v,nome:est.nome||''})}).catch(function(){})
+    }});
+  inp.addEventListener('blur',function(){var a=CFG.ativ[+inp.dataset.k];var v=est.valores[a.i];inp.value=v===undefined?'':String(v).replace('.',',')});
+  inp.addEventListener('focus',function(){if(inp.value)inp.select()});
+  inp.addEventListener('keydown',function(e){if(e.key==='Enter'||e.keyCode===13){e.preventDefault();var n=inputs[idx+1];if(n){n.focus();n.scrollIntoView({block:'center'})}else{$('nome').focus();$('nome').scrollIntoView({block:'center'})}}});
+});
+$('status').addEventListener('change',function(){if(this.value){est.status=this.value;est.dataEditada=true;salvar();tudo()}});
+$('nome').addEventListener('keydown',function(e){if(e.key==='Enter'){e.preventDefault();this.blur()}});
+$('nome').addEventListener('input',function(){est.nome=this.value.trim();salvar();$('msg').textContent=''});
+
+document.querySelectorAll('.abas button').forEach(function(b){b.addEventListener('click',function(){
+  document.querySelectorAll('.abas button').forEach(function(x){x.setAttribute('aria-selected',x===b)});
+  $('lista').style.display=$('assina').style.display=b.dataset.aba==='lista'?'':'none';$('resumo').style.display=b.dataset.aba==='resumo'?'block':'none';window.scrollTo(0,0)})});
+
+function precisaNome(){$('msg').className='msg';if(!est.nome){$('msg').textContent='Digite seu nome no fim da lista antes de enviar.';document.querySelector('[data-aba=lista]').click();$('nome').scrollIntoView({block:'center'});$('nome').focus();return true}return false}
+function nomeArq(){var s=est.status.split('-').reverse().join('');return'Avanco_Almaz_'+est.nome.replace(/[^\wÀ-ú]+/g,'_')+'_'+s+'.html'}
+function baixar(blob,nome){var u=URL.createObjectURL(blob),a=document.createElement('a');a.href=u;a.download=nome;document.body.appendChild(a);a.click();setTimeout(function(){URL.revokeObjectURL(u);a.remove()},1500)}
+$('enviar').addEventListener('click',function(){
+  if(precisaNome())return;
+  var dados={nome:est.nome,quando:new Date().toISOString(),status:est.status,valores:est.valores};
+  var json=JSON.stringify(dados).replace(/</g,'\\u003c');
+  var html=ORIGINAL.replace(/(<script id="preenchido" type="application\/json">)[\s\S]*?(<\/script>)/,function(m,a,b){return a+json+b});
+  var nome=nomeArq(),blob=new Blob([html],{type:'text/html'});
+  var arq=null;try{arq=new File([blob],nome,{type:'text/html'})}catch(e){}
+  if(arq&&navigator.canShare&&navigator.canShare({files:[arq]})){
+    navigator.share({files:[arq],title:'Avanço de obra Almaz',text:'Avanço preenchido por '+est.nome}).catch(function(e){if(e&&e.name!=='AbortError')baixar(blob,nome)});
+  }else{baixar(blob,nome);$('msg').textContent='Arquivo baixado. Anexe-o no WhatsApp ou no email.';$('msg').className='msg ok'}
+});
+})();
+</script>
+</body>
+</html>
