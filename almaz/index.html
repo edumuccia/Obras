@@ -42,7 +42,7 @@ header p{margin:2px 0 0;font-size:12px;color:#c3ccd4}
 .abas button[aria-selected="true"]{color:var(--tinta);border-bottom-color:var(--tinta)}
 main{padding:0 0 84px}
 table{width:100%;border-collapse:collapse;table-layout:fixed;background:var(--papel)}
-#lista th{position:sticky;top:42px;z-index:4;background:#f6f7f8;font-size:11px;font-weight:600;color:var(--tinta2);text-align:left;padding:6px 4px;border-bottom:1px solid var(--linha)}
+#lista th{position:sticky;top:var(--topo-h,42px);z-index:4;background:#f6f7f8;font-size:11px;font-weight:600;color:var(--tinta2);text-align:left;padding:6px 4px;border-bottom:1px solid var(--linha)}
 #lista td{padding:4px 4px;border-bottom:1px solid var(--linha);vertical-align:middle;font-size:13px}
 #lista .c-dt{width:40px;text-align:center;font-size:12px;color:var(--tinta2);font-variant-numeric:tabular-nums}
 #lista .c-pc{width:50px;text-align:center}
@@ -90,6 +90,19 @@ tr.grupo span{color:var(--tinta2)}
 .msgf{font-size:12px;color:var(--atr)}
 .msgf:empty{display:none}
 .vazio{text-align:center;color:var(--tinta2);padding:24px 10px!important}
+.topo{position:sticky;top:0;z-index:5;background:var(--papel)}
+.topo .abas{position:static;border-bottom:0;flex:1}
+.abasrow{display:flex;border-bottom:1px solid var(--linha)}
+.lupa{flex:0 0 48px;border:0;background:none;color:var(--tinta2);display:flex;align-items:center;justify-content:center;border-left:1px solid var(--linha)}
+.lupa[aria-pressed="true"]{color:var(--tinta);background:#eef1f3}
+.busca{display:flex;align-items:center;gap:4px;padding:6px 8px;border-bottom:1px solid var(--linha);background:#f6f7f8}
+.busca[hidden]{display:none}
+.busca input{flex:1 1 auto;min-width:0;font:inherit;font-size:16px;padding:7px 9px;border:1px solid #c9ced4;border-radius:6px;background:#fff;color:var(--tinta)}
+.bcont{flex:0 0 auto;font-size:12px;color:var(--tinta2);min-width:44px;text-align:center;font-variant-numeric:tabular-nums}
+.bbtn{flex:0 0 34px;height:34px;border:1px solid #c9ced4;border-radius:6px;background:#fff;color:var(--tinta);font-size:13px;padding:0}
+.bbtn:disabled{opacity:.4}
+mark.bm{background:#ffe066;color:inherit;padding:0;border-radius:2px}
+mark.bm.atual{background:#ff9f1a;color:#1c1c1c;box-shadow:0 0 0 2px #ff9f1a}
 </style>
 </head>
 <body>
@@ -107,10 +120,22 @@ tr.grupo span{color:var(--tinta2)}
   <label class="chk c-full"><input type="checkbox" id="pend"> Incluir pendentes de períodos anteriores</label>
   <div class="msgf c-full" id="msgf"></div>
 </div>
-<nav class="abas" role="tablist">
-  <button role="tab" aria-selected="true" data-aba="lista">Atividades</button>
-  <button role="tab" aria-selected="false" data-aba="resumo">Resumo</button>
-</nav>
+<div class="topo" id="topo">
+  <div class="busca" id="busca" hidden>
+    <input type="search" id="bq" placeholder="Buscar palavra" enterkeyhint="search" autocomplete="off" aria-label="Buscar palavra na lista">
+    <span class="bcont" id="bcont"></span>
+    <button type="button" class="bbtn" id="bant" aria-label="Resultado anterior">&#9650;</button>
+    <button type="button" class="bbtn" id="bprox" aria-label="Próximo resultado">&#9660;</button>
+    <button type="button" class="bbtn" id="bfechar" aria-label="Fechar busca">&#10005;</button>
+  </div>
+  <div class="abasrow">
+    <nav class="abas" role="tablist">
+      <button role="tab" aria-selected="true" data-aba="lista">Atividades</button>
+      <button role="tab" aria-selected="false" data-aba="resumo">Resumo</button>
+    </nav>
+    <button type="button" class="lupa" id="lupa" aria-label="Buscar palavra"><svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5" fill="none" stroke="currentColor" stroke-width="2.2"/><line x1="15.5" y1="15.5" x2="21" y2="21" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/></svg></button>
+  </div>
+</div>
 <main>
   <table id="lista">
     <thead><tr><th>Atividade</th><th class="c-dt">Início</th><th class="c-dt">Térm.</th><th class="c-pc">%</th><th class="c-si">Situação</th></tr></thead>
@@ -196,6 +221,7 @@ function render(){
   inputs=[].slice.call(document.querySelectorAll('.pc'));
   if(PRE){inputs.forEach(function(inp){inp.readOnly=true;inp.tabIndex=-1})}
   VIS.forEach(function(a,k){pintar(k)});resumo();
+  if(window.__buscaRefaz)window.__buscaRefaz();
 }
 var TB=document.querySelector('#lista tbody');
 TB.addEventListener('input',function(e){var inp=e.target;if(!inp.classList.contains('pc'))return;
@@ -230,10 +256,73 @@ $('status').addEventListener('change',function(){if(this.value){est.status=this.
 $('nome').addEventListener('keydown',function(e){if(e.key==='Enter'){e.preventDefault();this.blur()}});
 $('nome').addEventListener('input',function(){est.nome=this.value.trim();salvar();$('msg').textContent=''});
 
-document.querySelectorAll('.abas button').forEach(function(b){b.addEventListener('click',function(){
-  document.querySelectorAll('.abas button').forEach(function(x){x.setAttribute('aria-selected',x===b)});
+document.querySelectorAll('.abas button[data-aba]').forEach(function(b){b.addEventListener('click',function(){
+  document.querySelectorAll('.abas button[data-aba]').forEach(function(x){x.setAttribute('aria-selected',x===b)});
   $('lista').style.display=$('assina').style.display=b.dataset.aba==='lista'?'':'none';$('resumo').style.display=b.dataset.aba==='resumo'?'block':'none';window.scrollTo(0,0)})});
 
+
+// Busca tipo Ctrl+F: destaca e rola até o resultado, sem esconder nada
+(function(){
+var topo=$('topo'),barra=$('busca'),bq=$('bq'),cont=$('bcont'),lupa=$('lupa');
+var marks=[],atual=-1,tmr=null;
+function ajustaTopo(){document.documentElement.style.setProperty('--topo-h',topo.offsetHeight+'px')}
+ajustaTopo();window.addEventListener('resize',ajustaTopo);
+function norm(s){return s.normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase()}
+function normChar(c){var n=norm(c);return n.length?n[0]:c.toLowerCase()}
+function limpa(){marks.forEach(function(m){var p=m.parentNode;if(!p)return;p.replaceChild(document.createTextNode(m.textContent),m);p.normalize()});marks=[];atual=-1}
+function alvos(){return [].slice.call(document.querySelectorAll('#lista td.nm, #lista tr.grupo td, #lista tr.etapa td'))}
+function marca(q){
+  var nq=norm(q);
+  alvos().forEach(function(el){
+    var w=document.createTreeWalker(el,NodeFilter.SHOW_TEXT,null),nodes=[],n;
+    while(n=w.nextNode())nodes.push(n);
+    nodes.forEach(function(tn){
+      var txt=tn.nodeValue,nt='';for(var i=0;i<txt.length;i++)nt+=normChar(txt[i]);
+      var pos=[],from=0,ix;
+      while((ix=nt.indexOf(nq,from))!==-1){pos.push(ix);from=ix+nq.length}
+      if(!pos.length)return;
+      var frag=document.createDocumentFragment(),last=0;
+      pos.forEach(function(p){
+        if(p>last)frag.appendChild(document.createTextNode(txt.slice(last,p)));
+        var m=document.createElement('mark');m.className='bm';m.textContent=txt.slice(p,p+nq.length);
+        frag.appendChild(m);marks.push(m);last=p+nq.length});
+      if(last<txt.length)frag.appendChild(document.createTextNode(txt.slice(last)));
+      tn.parentNode.replaceChild(frag,tn);
+    });
+  });
+}
+function mostra(i,semRolar){
+  if(!marks.length){cont.textContent=bq.value.trim().length>=2?'0':'';$('bant').disabled=$('bprox').disabled=true;return}
+  if(atual>=0&&marks[atual])marks[atual].classList.remove('atual');
+  atual=(i+marks.length)%marks.length;
+  var m=marks[atual];m.classList.add('atual');
+  cont.textContent=(atual+1)+' de '+marks.length;
+  $('bant').disabled=$('bprox').disabled=false;
+  if(semRolar)return;
+  var r=m.getBoundingClientRect(),alvo=window.scrollY+r.top-(window.innerHeight/2)+r.height/2;
+  alvo=Math.max(0,alvo);window.scrollTo({top:alvo,behavior:Math.abs(alvo-window.scrollY)>1200?'auto':'smooth'});
+}
+function busca(){
+  limpa();var q=bq.value.trim();
+  if(q.length<2){cont.textContent='';$('bant').disabled=$('bprox').disabled=true;return}
+  marca(q);mostra(0);
+}
+bq.addEventListener('input',function(){clearTimeout(tmr);tmr=setTimeout(busca,200)});
+bq.addEventListener('keydown',function(e){if(e.key==='Enter'){e.preventDefault();if(marks.length)mostra(atual+(e.shiftKey?-1:1));else busca()}});
+$('bprox').addEventListener('click',function(){if(marks.length)mostra(atual+1)});
+$('bant').addEventListener('click',function(){if(marks.length)mostra(atual-1)});
+function abre(){
+  var ab=document.querySelector('[data-aba=lista]');if(ab.getAttribute('aria-selected')!=='true')ab.click();
+  barra.hidden=false;lupa.setAttribute('aria-pressed','true');ajustaTopo();bq.focus();
+  if(bq.value.trim().length>=2)busca();
+}
+function fecha(){limpa();barra.hidden=true;lupa.setAttribute('aria-pressed','false');cont.textContent='';bq.blur();ajustaTopo()}
+lupa.addEventListener('click',function(){if(barra.hidden)abre();else fecha()});
+$('bfechar').addEventListener('click',fecha);
+document.querySelector('[data-aba=resumo]').addEventListener('click',function(){if(!barra.hidden)fecha()});
+$('bant').disabled=$('bprox').disabled=true;
+window.__buscaRefaz=function(){marks=[];atual=-1;if(barra.hidden)return;var q=bq.value.trim();if(q.length<2)return;marca(q);mostra(0,true)};
+})();
 function precisaNome(){$('msg').className='msg';if(!est.nome){$('msg').textContent='Digite seu nome no fim da lista antes de enviar.';document.querySelector('[data-aba=lista]').click();$('nome').scrollIntoView({block:'center'});$('nome').focus();return true}return false}
 function nomeArq(){var s=est.status.split('-').reverse().join('');return'Avanco_Almaz_'+est.nome.replace(/[^\wÀ-ú]+/g,'_')+'_'+s+'.html'}
 function baixar(blob,nome){var u=URL.createObjectURL(blob),a=document.createElement('a');a.href=u;a.download=nome;document.body.appendChild(a);a.click();setTimeout(function(){URL.revokeObjectURL(u);a.remove()},1500)}
