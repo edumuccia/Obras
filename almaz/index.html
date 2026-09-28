@@ -138,7 +138,7 @@ mark.bm.atual{background:#ff9f1a;color:#1c1c1c;box-shadow:0 0 0 2px #ff9f1a}
     <div class="acum sep" id="tacum">Acumulado</div>
     <div class="bloco menor"><span>Meta</span><b id="ameta">0,00%</b></div>
     <div class="bloco menor"><span>Executado</span><b id="avobra">0,00%</b></div>
-    <div class="bloco menor"></div>
+    <div class="bloco menor"><span>Diferença</span><b id="adif">0,00%</b></div>
   </div>
 </header>
 <div class="semjs" id="semjs"><b>A lista não carregou?</b> O arquivo abriu numa pré-visualização, que não funciona. <b>No iPhone:</b> toque em Compartilhar e escolha <b>Chrome</b>. <b>No Android:</b> escolha abrir com o <b>Chrome</b>.</div>
@@ -238,7 +238,7 @@ function difEl(id,df){var el=$(id);el.textContent=(df>0?'+':df<0?'\u2212':'')+fm
 function avObra(){var v=0,of=0;ATIV.forEach(function(a){v+=(a.w||0)*pct(a)/100;of+=(a.w||0)*a.p/100});v=v/TOTAL_PESO;of=of/TOTAL_PESO;
   var ym=(est.status||HOJE).slice(0,7);
   var ex=r2(v*100),ma=r2(metaAte(ym)*100);
-  $('avobra').textContent=fmt(ex);$('ameta').textContent=fmt(ma);
+  $('avobra').textContent=fmt(ex);$('ameta').textContent=fmt(ma);difEl('adif',r2(ex-ma));
   $('tacum').innerHTML='<b>Acumulado</b> · meta até o fim de '+rot(ym);
   if(ym<=FECH_YM){
     $('tmes').innerHTML='<b>'+rot(ym)+'</b> · mês já fechado';
