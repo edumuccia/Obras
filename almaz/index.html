@@ -192,7 +192,8 @@ function visiveis(){return ATIV.filter(function(a){
   if(est.pend&&a.f<est.de&&pct(a)<100)return true;
   return false})}
 function pintar(k){var a=VIS[k],s=situ(a),el=$('si'+k);el.textContent=s;el.className='si '+CLS[s]}
-function avObra(){var v=RAW.base||0;ATIV.forEach(function(a){v+=(a.w||0)*pct(a)/100});$('avobra').textContent=(v*100).toFixed(2).replace('.',',')+'%'}
+var TOTAL_PESO=0.9959131589196109; // soma real dos pesos no .mpp (99,5913...%), usado para bater com o Project
+function avObra(){var v=RAW.base||0;ATIV.forEach(function(a){v+=(a.w||0)*pct(a)/100});v=v/TOTAL_PESO;$('avobra').textContent=(v*100).toFixed(2).replace('.',',')+'%'}
 function resumo(){var m={},ord=[];
   VIS.forEach(function(a){if(!m[a.e]){m[a.e]={t:0,Atrasada:0,'Em andamento':0,'A iniciar':0,'Concluída':0,soma:0};ord.push(a.e)}
     var r=m[a.e];r.t++;r[situ(a)]++;r.soma+=pct(a)});
