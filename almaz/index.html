@@ -103,12 +103,20 @@ tr.grupo span{color:var(--tinta2)}
 .bbtn:disabled{opacity:.4}
 mark.bm{background:#ffe066;color:inherit;padding:0;border-radius:2px}
 mark.bm.atual{background:#ff9f1a;color:#1c1c1c;box-shadow:0 0 0 2px #ff9f1a}
+.sync{margin:4px 0 0!important;font-size:12px!important;color:#c3ccd4!important;display:flex;align-items:center;gap:6px}
+.sync[hidden]{display:none}
+.sync::before{content:"";width:8px;height:8px;border-radius:50%;background:#7fd19b;flex:0 0 8px}
+.sync.carregando::before{background:#f2c94c;animation:pisca 1s ease-in-out infinite}
+.sync.erro{color:#ffb4b4!important}
+.sync.erro::before{background:#ff6b6b}
+@keyframes pisca{50%{opacity:.25}}
 </style>
 </head>
 <body>
 <header>
   <h1>Avanço de obra · Almaz</h1>
   <p>Cronograma completo · <span id="qtd"></span></p>
+  <p class="sync" id="sync" hidden></p>
   <div class="avobra"><span>Executado da obra</span><b id="avobra">0,00%</b></div>
 </header>
 <div class="semjs" id="semjs"><b>A lista não carregou?</b> O arquivo abriu numa pré-visualização, que não funciona. <b>No iPhone:</b> toque em Compartilhar e escolha <b>Chrome</b>. <b>No Android:</b> escolha abrir com o <b>Chrome</b>.</div>
@@ -229,7 +237,7 @@ TB.addEventListener('input',function(e){var inp=e.target;if(!inp.classList.conta
   var v=ler(inp.value);var a=VIS[+inp.dataset.k];
   if(v===undefined)delete est.valores[a.u];else if(v!==null)est.valores[a.u]=v;
   inp.classList.toggle('lancado',est.valores[a.u]!==undefined);pintar(+inp.dataset.k);resumo();salvar();
-  if(v!==null&&v!==undefined&&!PRE){fetch(API,{method:'POST',body:JSON.stringify({i:a.u,p:v,nome:est.nome||''})}).catch(function(){})}});
+  if(v!==null&&v!==undefined&&!PRE){fetch(API,{method:'POST',body:JSON.stringify({i:a.u,p:v,nome:est.nome||''})}).catch(function(){sync('Sem conexão: o último lançamento não foi salvo','erro')})}});
 TB.addEventListener('focusout',function(e){var inp=e.target;if(!inp.classList.contains('pc'))return;var a=VIS[+inp.dataset.k];var v=est.valores[a.u];inp.value=v===undefined?'':String(v).replace('.',',')});
 TB.addEventListener('focusin',function(e){var inp=e.target;if(inp.classList.contains('pc')&&inp.value)inp.select()});
 TB.addEventListener('keydown',function(e){var inp=e.target;if(!inp.classList.contains('pc'))return;
@@ -239,14 +247,27 @@ if(PRE){$('status').disabled=true;$('nome').disabled=true;$('enviar').style.disp
 $('semjs').style.display='none';
 if('serviceWorker' in navigator){navigator.serviceWorker.register('sw.js').catch(function(){})}
 
+function sync(txt,cls){var el=$('sync');el.hidden=false;el.textContent=txt;el.className='sync'+(cls?' '+cls:'')}
+var lendo=false,ultimaLeitura=0;
+function hora(){var d=new Date();return d.getHours()+'h'+('0'+d.getMinutes()).slice(-2)}
+function carregar(){
+  if(PRE||lendo)return;lendo=true;sync('Atualizando...','carregando');
+  fetch(API).then(function(r){return r.json()}).then(function(d){
+    lendo=false;
+    if(!d||!d.ok){sync('Sem conexão com a planilha','erro');return}
+    ultimaLeitura=Date.now();var mudou=false;
+    Object.keys(d.valores).forEach(function(id){var r=d.valores[id];
+      if(r.p!==undefined&&r.p!==null&&r.p!==''){var n=Number(r.p);if(est.valores[id]!==n){est.valores[id]=n;mudou=true}}});
+    if(mudou){salvar();var ae=document.activeElement;
+      if(ae&&ae.classList&&ae.classList.contains('pc'))avObra();else render()}
+    sync('Atualizado às '+hora());
+  }).catch(function(){lendo=false;sync('Sem conexão com a planilha','erro')});
+}
 if(!PRE){
-fetch(API).then(function(r){return r.json()}).then(function(d){
-  if(!d||!d.ok)return;var mudou=false;
-  Object.keys(d.valores).forEach(function(id){var r=d.valores[id];
-    if(r.p!==undefined&&r.p!==null&&r.p!==''){est.valores[id]=Number(r.p);mudou=true}});
-  if(mudou){salvar();var ae=document.activeElement;
-    if(ae&&ae.classList&&ae.classList.contains('pc'))avObra();else render()}
-}).catch(function(){});
+  carregar();
+  document.addEventListener('visibilitychange',function(){if(document.visibilityState==='visible'&&Date.now()-ultimaLeitura>20000)carregar()});
+  window.addEventListener('pageshow',function(e){if(e.persisted)carregar()});
+  window.addEventListener('online',carregar);
 }
 
 function filtro(){var de=$('de').value,ate=$('ate').value;
