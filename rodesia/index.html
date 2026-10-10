@@ -38,7 +38,7 @@ header p{margin:2px 0 0;font-size:12px;color:#c3ccd4}
 .aviso[hidden]{display:none}
 .semjs{margin:10px 12px;padding:12px;font-size:14px;line-height:1.4;background:#fdecc8;border:1px solid #e0b45a;border-radius:8px;color:#5a3d00}
 .abas{display:flex;background:var(--papel);border-bottom:1px solid var(--linha);position:sticky;top:0;z-index:5}
-.abas button{flex:1;font:inherit;font-weight:600;padding:10px 0;border:0;background:none;color:var(--tinta2);border-bottom:3px solid transparent}
+.abas button{flex:1;font:inherit;font-size:14px;white-space:nowrap;font-weight:600;padding:10px 0;border:0;background:none;color:var(--tinta2);border-bottom:3px solid transparent}
 .abas button[aria-selected="true"]{color:var(--tinta);border-bottom-color:var(--tinta)}
 main{padding:0 0 84px}
 table{width:100%;border-collapse:collapse;table-layout:fixed;background:var(--papel)}
@@ -67,10 +67,22 @@ tr.grupo span{color:var(--tinta2)}
 .assina input{width:100%;font:inherit;font-size:16px;padding:9px 10px;border:1px solid var(--amarelo-borda);background:var(--amarelo);border-radius:6px;color:var(--tinta)}
 #resumo{display:none;padding:12px 8px}
 #resumo table{border:1px solid var(--linha)}
-#resumo th,#resumo td{padding:7px 3px;border-bottom:1px solid var(--linha);text-align:center;font-size:12.5px;font-variant-numeric:tabular-nums}
+#resumo th,#resumo td{padding:7px 2px;border-bottom:1px solid var(--linha);text-align:center;font-size:12.5px;font-variant-numeric:tabular-nums}
 #resumo th{font-size:10.5px;color:var(--tinta2);font-weight:600;background:#f6f7f8;line-height:1.15}
-#resumo td:first-child,#resumo th:first-child{text-align:left;padding-left:8px;width:29%}
-#resumo th:last-child,#resumo td:last-child{width:15%;padding-right:6px}
+#resumo .rs-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch}
+#resumo table{min-width:366px}
+#resumo th{font-size:9.5px}
+#resumo td{font-size:12px}
+#resumo td:first-child,#resumo th:first-child{text-align:left;padding-left:8px;width:98px;overflow-wrap:anywhere;hyphens:auto;position:sticky;left:0;z-index:1;font-size:11.5px}
+#resumo td:first-child{background:#fff}
+#resumo th:first-child{background:#f6f7f8;font-size:10px}
+#resumo tr.total td:first-child{background:#e7ebee}
+#resumo th:nth-child(2),#resumo td:nth-child(2){width:32px}
+#resumo th:nth-child(3),#resumo td:nth-child(3){width:36px}
+#resumo th:nth-child(4),#resumo td:nth-child(4),#resumo th:nth-child(5),#resumo td:nth-child(5){width:38px}
+#resumo th:nth-child(6),#resumo td:nth-child(6){width:36px}
+#resumo th:nth-child(7),#resumo td:nth-child(7),#resumo th:nth-child(8),#resumo td:nth-child(8){width:44px}
+#resumo th:last-child,#resumo td:last-child{padding-right:4px}
 #resumo tr.total td{font-weight:700;background:#e7ebee}
 #resumo .atr{color:var(--atr);font-weight:700}
 #resumo p{font-size:12px;color:var(--tinta2);margin:10px 4px 0}
@@ -141,7 +153,7 @@ mark.bm.atual{background:#ff9f1a;color:#1c1c1c;box-shadow:0 0 0 2px #ff9f1a}
   <div class="abasrow">
     <nav class="abas" role="tablist">
       <button role="tab" aria-selected="true" data-aba="lista">Atividades</button>
-      <button role="tab" aria-selected="false" data-aba="resumo">Resumo</button>
+      <button role="tab" aria-selected="false" data-aba="resumo">Resumo / PPC</button>
     </nav>
     <button type="button" class="lupa" id="lupa" aria-label="Buscar palavra"><svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5" fill="none" stroke="currentColor" stroke-width="2.2"/><line x1="15.5" y1="15.5" x2="21" y2="21" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/></svg></button>
   </div>
@@ -153,11 +165,11 @@ mark.bm.atual{background:#ff9f1a;color:#1c1c1c;box-shadow:0 0 0 2px #ff9f1a}
   </table>
   <div class="assina" id="assina"><label for="nome">Seu nome</label><input type="text" id="nome" autocomplete="name" enterkeyhint="done" placeholder="Digite seu nome"></div>
   <section id="resumo">
-    <table>
-      <thead><tr><th>Etapa</th><th>Total</th><th>Atras.</th><th>Em andam.</th><th>A iniciar</th><th>Concl.</th><th>Avanço médio</th></tr></thead>
+    <div class="rs-wrap"><table>
+      <thead><tr><th>Etapa</th><th>Total</th><th>Atras.</th><th>Em andam.</th><th>A iniciar</th><th>Concl.</th><th>Avanço médio</th><th>Avanço total</th></tr></thead>
       <tbody></tbody>
-    </table>
-    <p>Situação recalculada pela data de status. Avanço médio é a média simples do % das atividades.</p>
+    </table></div>
+    <p>Situação recalculada pela data de preenchimento. <b>Em andamento</b> = atividade com algum % lançado. Avanço médio = média simples do % das atividades. <b>Avanço total</b> = atividades 100% concluídas ÷ total de atividades.</p>
   </section>
 </main>
 <div class="acoes">
@@ -190,7 +202,7 @@ function pct(a){var v=est.valores[a.u];return (v===undefined||v<a.p)?a.p:v}
 function campo(a){var v=est.valores[a.u];return (v!==undefined&&v>=a.p)?v:undefined}
 function situ(a){var p=pct(a),s=est.status;
   if(p>=100)return'Concluída'; if(a.f<s)return'Atrasada';
-  if(p>0||a.r||a.s<=s)return'Em andamento'; return'A iniciar'}
+  if(p>0)return'Em andamento'; return'A iniciar'}
 var CLS={'Concluída':'s-Concluida','Atrasada':'s-Atrasada','Em andamento':'s-andamento','A iniciar':'s-iniciar'};
 
 if(PRE){var q=new Date(PRE.quando);var f=$('faixa');f.hidden=false;
@@ -209,11 +221,12 @@ var MESES=['jan','fev','mar','abr','mai','jun','jul','ago','set','out','nov','de
 function r2(x){return Math.round(x*100)/100}
 function rot(ym){return MESES[+ym.slice(5,7)-1]+'/'+ym.slice(0,4)}
 function avObra(){}
+function fp(x){var v=Math.round(x*10)/10;return String(v).replace('.',',')+'%'}
 function resumo(){var m={},ord=[];
   VIS.forEach(function(a){if(!m[a.e]){m[a.e]={t:0,Atrasada:0,'Em andamento':0,'A iniciar':0,'Concluída':0,soma:0};ord.push(a.e)}
     var r=m[a.e];r.t++;r[situ(a)]++;r.soma+=pct(a)});
   var T={t:0,Atrasada:0,'Em andamento':0,'A iniciar':0,'Concluída':0,soma:0},h='';
-  function lin(n,r,c){return'<tr'+(c?' class="total"':'')+'><td>'+esc(n)+'</td><td>'+r.t+'</td><td class="'+(r.Atrasada?'atr':'')+'">'+r.Atrasada+'</td><td>'+r['Em andamento']+'</td><td>'+r['A iniciar']+'</td><td>'+r['Concluída']+'</td><td>'+(r.t?Math.round(r.soma/r.t):0)+'%</td></tr>'}
+  function lin(n,r,c){return'<tr'+(c?' class="total"':'')+'><td>'+esc(n)+'</td><td>'+r.t+'</td><td class="'+(r.Atrasada?'atr':'')+'">'+r.Atrasada+'</td><td>'+r['Em andamento']+'</td><td>'+r['A iniciar']+'</td><td>'+r['Concluída']+'</td><td>'+fp(r.t?r.soma/r.t:0)+'</td><td>'+fp(r.t?r['Concluída']/r.t*100:0)+'</td></tr>'}
   ord.forEach(function(e){var r=m[e];for(var x in T)T[x]+=r[x];h+=lin(e,r)});
   h+=lin('Total',T,1);document.querySelector('#resumo tbody').innerHTML=h;avObra()}
 // Envio dos lançamentos: espera a pessoa terminar de digitar e nunca deixa um valor antigo vencer o novo
