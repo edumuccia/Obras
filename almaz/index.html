@@ -486,7 +486,7 @@ function barra(){var n=nRasc(),s=$('salvar'),d=$('descartar'),i=$('rinfo');
   d.hidden=!n;$('botoes').classList.toggle('so',!n);
   if(!n){i.textContent='';ajustaRodape();return}
   var velho=Object.keys(rasc).some(function(u){return rasc[u].d&&rasc[u].d.slice(0,7)<HOJE.slice(0,7)});
-  i.textContent=n+(n===1?' alteração não salva':' alterações não salvas')+(velho?'. Atenção: há valores digitados no mês passado; ao salvar, entram em '+rot(HOJE.slice(0,7))+'.':'. Os colegas só veem depois de salvar.');ajustaRodape()}
+  i.textContent=n+(n===1?' alteração não salva':' alterações não salvas')+(velho?'. Atenção: há valores digitados no mês passado; ao salvar, entram em '+rot(HOJE.slice(0,7))+'.':'. Demais usuários só veem depois de salvar.');ajustaRodape()}
 TB.addEventListener('focusout',function(e){var inp=e.target;if(!inp.classList.contains('pc')||inp.classList.contains('trav'))return;var a=VIS[+inp.dataset.k];inp.classList.remove('abaixo');var v=campo(a);inp.value=v===undefined?'':String(v).replace('.',',');enviaPend()});
 TB.addEventListener('focusin',function(e){var inp=e.target;if(inp.classList.contains('pc')&&inp.value)inp.select()});
 TB.addEventListener('keydown',function(e){var inp=e.target;if(!inp.classList.contains('pc'))return;
