@@ -452,8 +452,8 @@ function render(){
     if(a.g&&a.g!==ug){var pr=a.g.split(' > ');var ult=pr.pop();
       h+='<tr class="grupo"><td colspan="5">'+(pr.length?'<span>'+esc(pr.join(' › '))+' › </span>':'')+'<b>'+esc(ult)+'</b></td></tr>';ug=a.g}
     var v=campo(a);
-    h+='<tr><td class="nm">'+esc(a.n)+' <small>#'+a.id+'</small>'+(a.p>0?'<small class="of">oficial '+String(a.p).replace('.',',')+'%</small>':'')+(rasc[a.u]?'<small class="ns" id="ns'+k+'">não salvo</small>':'<small class="ns" id="ns'+k+'" hidden>não salvo</small>')+'</td><td class="c-dt">'+dm(a.s)+'</td><td class="c-dt">'+dm(a.f)+'</td>'+
-       '<td class="c-pc">'+(a.p>=100?'<input class="pc trav" data-k="'+k+'" type="text" readonly tabindex="-1" aria-label="'+esc(a.n)+': 100% oficial" value="100">':'<input class="pc'+(v!==undefined?' lancado':'')+(rasc[a.u]?' rasc':'')+'" data-k="'+k+'" type="text" inputmode="decimal" enterkeyhint="next" autocomplete="off" aria-label="% executado de '+esc(a.n)+'" placeholder="'+a.p+'" value="'+(v!==undefined?String(v).replace('.',','):'')+'">')+'</td>'+
+    h+='<tr><td class="nm">'+esc(a.n)+' <small>#'+a.id+'</small>'+(a.p>0?'<small class="of">mês anterior '+String(a.p).replace('.',',')+'%</small>':'')+(rasc[a.u]?'<small class="ns" id="ns'+k+'">não salvo</small>':'<small class="ns" id="ns'+k+'" hidden>não salvo</small>')+'</td><td class="c-dt">'+dm(a.s)+'</td><td class="c-dt">'+dm(a.f)+'</td>'+
+       '<td class="c-pc">'+(a.p>=100?'<input class="pc trav" data-k="'+k+'" type="text" readonly tabindex="-1" aria-label="'+esc(a.n)+': 100% no mês anterior" value="100">':'<input class="pc'+(v!==undefined?' lancado':'')+(rasc[a.u]?' rasc':'')+'" data-k="'+k+'" type="text" inputmode="decimal" enterkeyhint="next" autocomplete="off" aria-label="% executado de '+esc(a.n)+'" placeholder="'+a.p+'" value="'+(v!==undefined?String(v).replace('.',','):'')+'">')+'</td>'+
        '<td class="c-si"><span class="si" id="si'+k+'"></span></td></tr>';
   });
   if(!VIS.length)h='<tr><td colspan="5" class="vazio">Nenhuma atividade neste período.</td></tr>';
@@ -469,8 +469,8 @@ var TB=document.querySelector('#lista tbody');
 TB.addEventListener('input',function(e){var inp=e.target;if(!inp.classList.contains('pc')||inp.classList.contains('trav'))return;
   var v=ler(inp.value);var a=VIS[+inp.dataset.k];
   if(v!==undefined&&v!==null&&v<a.p){inp.classList.add('abaixo');
-    $('msg').className='msg';$('msg').textContent='Mínimo oficial de #'+a.id+': '+String(a.p).replace('.',',')+'% (fechamento de '+rot(FECH_YM)+')';return}
-  inp.classList.remove('abaixo');if($('msg').textContent.indexOf('Mínimo oficial')===0)$('msg').textContent='';
+    $('msg').className='msg';$('msg').textContent='Mínimo do mês anterior para #'+a.id+': '+String(a.p).replace('.',',')+'% (fechamento de '+rot(FECH_YM)+')';return}
+  inp.classList.remove('abaixo');if($('msg').textContent.indexOf('Mínimo do mês anterior')===0)$('msg').textContent='';
   if(v===null||PRE)return;
   var sv=est.valores[a.u];
   if(v===undefined||v===sv){delete rasc[a.u]}

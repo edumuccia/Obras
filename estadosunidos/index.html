@@ -48,6 +48,7 @@ table{width:100%;border-collapse:collapse;table-layout:fixed;background:var(--pa
 #lista td:last-child,#lista th:last-child{padding-right:8px}
 .nm{overflow-wrap:anywhere}
 .nm small{color:var(--tinta2);font-size:11px}
+.nm small.of{display:block;font-size:10.5px;color:var(--con);font-weight:600;margin-top:1px}
 tr.etapa td{background:var(--tinta);color:#fff;font-weight:700;font-size:12px;padding:5px 10px}
 tr.grupo td{background:#e7ebee;color:var(--tinta);font-size:11.5px;padding:3px 10px;line-height:1.25}
 tr.grupo span{color:var(--tinta2)}
@@ -238,7 +239,7 @@ function render(){
     if(a.g&&a.g!==ug){var pr=a.g.split(' > ');var ult=pr.pop();
       h+='<tr class="grupo"><td colspan="5">'+(pr.length?'<span>'+esc(pr.join(' › '))+' › </span>':'')+'<b>'+esc(ult)+'</b></td></tr>';ug=a.g}
     var v=valor(a);
-    h+='<tr><td class="nm">'+esc(a.n)+' <small>#'+a.i+'</small><small class="ns" id="ns'+k+'"'+(rasc[a.u]?'':' hidden')+'>não salvo</small></td><td class="c-dt">'+dm(a.s)+'</td><td class="c-dt">'+dm(a.f)+'</td>'+
+    h+='<tr><td class="nm">'+esc(a.n)+' <small>#'+a.i+'</small>'+(a.p>0?'<small class="of">mês anterior '+String(a.p).replace('.',',')+'%</small>':'')+'<small class="ns" id="ns'+k+'"'+(rasc[a.u]?'':' hidden')+'>não salvo</small></td><td class="c-dt">'+dm(a.s)+'</td><td class="c-dt">'+dm(a.f)+'</td>'+
        '<td class="c-pc"><input class="pc'+(v!==undefined?' lancado':'')+(rasc[a.u]?' rasc':'')+'" data-k="'+k+'" type="text" inputmode="decimal" enterkeyhint="next" autocomplete="off" aria-label="% executado de '+esc(a.n)+'" placeholder="'+a.p+'" value="'+(v!==undefined?String(v).replace('.',','):'')+'"></td>'+
        '<td class="c-si"><span class="si" id="si'+k+'"></span></td></tr>';
   });
